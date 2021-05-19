@@ -45,7 +45,8 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 class FollowListCreateViewSet(
     mixins.ListModelMixin, mixins.CreateModelMixin,
-    viewsets.GenericViewSet):
+    viewsets.GenericViewSet
+):
 
     serializer_class = FollowSerializer
     permission_classes = (permissions.IsAuthenticated,)
@@ -61,7 +62,8 @@ class FollowListCreateViewSet(
             if (
                 not User.objects.filter(
                     username=self.request.data.get('following')
-                ).exists()):
+                ).exists()
+            ):
                 raise exceptions.ParseError()
             following = User.objects.get(
                 username=self.request.data.get('following'))
@@ -77,7 +79,8 @@ class FollowListCreateViewSet(
 
 class GroupCreateViewSet(
     mixins.ListModelMixin, mixins.CreateModelMixin,
-    viewsets.GenericViewSet):
+    viewsets.GenericViewSet
+):
 
     queryset = Group.objects.all()
 
