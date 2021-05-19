@@ -1,10 +1,19 @@
 from django.core import exceptions
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets, mixins, permissions, filters, exceptions
+from rest_framework import (
+    viewsets,
+    mixins,
+    permissions,
+    filters,
+    exceptions)
 
 from .models import Post, User, Group, Follow
 from .permissions import PostAndCommentPermissions
-from .serializers import CommentSerializer, PostSerializer, FollowSerializer, GroupSerializer
+from .serializers import (
+    CommentSerializer,
+    PostSerializer,
+    FollowSerializer,
+    GroupSerializer)
 from django_filters.rest_framework import DjangoFilterBackend
 
 
@@ -34,7 +43,9 @@ class CommentViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user, post=post)
 
 
-class FollowListCreateViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
+class FollowListCreateViewSet(
+    mixins.ListModelMixin,mixins.CreateModelMixin,
+    viewsets.GenericViewSet):
 
     serializer_class = FollowSerializer
     permission_classes = (permissions.IsAuthenticated,)
@@ -45,22 +56,29 @@ class FollowListCreateViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, vi
         return self.request.user.followers.all()
 
     def perform_create(self, serializer):
-            
-            if serializer.is_valid(raise_exception=True):
-                if (not User.objects.filter(username=self.request.data.get('following')).exists()):
-                    raise exceptions.ParseError()
-                following = User.objects.get(username=self.request.data.get('following'))
-                user = self.request.user
-                if (following == user):
-                    raise exceptions.ParseError()
 
-                if Follow.objects.filter(following=following, user=user).exists():
-                    raise exceptions.ParseError() 
+        if serializer.is_valid(raise_exception=True):
+            if (
+                not User.objects.filter(
+                    username=self.request.data.get('following')
+                    ).exists()):
+                raise exceptions.ParseError()
+            following = User.objects.get(username=self.request.data.get('following'))
+            user = self.request.user
+            if (following == user):
+                raise exceptions.ParseError()
 
-                serializer.save(user=user, following=following)
+            if Follow.objects.filter(following=following, user=user).exists():
+                raise exceptions.ParseError() 
+
+            serializer.save(user=user, following=following)
 
 
-class GroupCreateViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
+class GroupCreateViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    viewsets.GenericViewSet):
+
     queryset = Group.objects.all()
 
     serializer_class = GroupSerializer
