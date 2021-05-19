@@ -1,7 +1,5 @@
 from django.contrib.auth import get_user_model
 from django.db import models
-from django.db.models.constraints import UniqueConstraint
-from django.db.models.query_utils import Q
 from django.core.exceptions import FieldError
 
 User = get_user_model()
@@ -88,4 +86,3 @@ class Follow(models.Model):
 
     def __str__(self):
         return f'{self.user} подписан на {self.following}'
-

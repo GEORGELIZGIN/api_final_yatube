@@ -44,7 +44,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 
 class FollowListCreateViewSet(
-    mixins.ListModelMixin,mixins.CreateModelMixin,
+    mixins.ListModelMixin, mixins.CreateModelMixin,
     viewsets.GenericViewSet):
 
     serializer_class = FollowSerializer
@@ -61,22 +61,22 @@ class FollowListCreateViewSet(
             if (
                 not User.objects.filter(
                     username=self.request.data.get('following')
-                    ).exists()):
+                ).exists()):
                 raise exceptions.ParseError()
-            following = User.objects.get(username=self.request.data.get('following'))
+            following = User.objects.get(
+                username=self.request.data.get('following'))
             user = self.request.user
             if (following == user):
                 raise exceptions.ParseError()
 
             if Follow.objects.filter(following=following, user=user).exists():
-                raise exceptions.ParseError() 
+                raise exceptions.ParseError()
 
             serializer.save(user=user, following=following)
 
 
 class GroupCreateViewSet(
-    mixins.ListModelMixin,
-    mixins.CreateModelMixin,
+    mixins.ListModelMixin, mixins.CreateModelMixin,
     viewsets.GenericViewSet):
 
     queryset = Group.objects.all()
