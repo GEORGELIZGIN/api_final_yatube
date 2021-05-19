@@ -1,7 +1,7 @@
 openapi: 3.0.2
 info:
   title: 'Yatube API'
-  version: ''
+  version: 1.0.0
   description: API начинается с /api/v1/
 
 servers:
@@ -23,7 +23,8 @@ paths:
     get:
       tags:
         - POSTS
-      description: Получить список всех публикаций
+      summary: Получить список всех публикаций
+      description: Возвращает текст, автора и время каждой публикации
       parameters:
       - name: group
         in: query
@@ -39,6 +40,12 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Post'
+        400:
+          description: Ошибка. Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
     post:
       tags:
         - POSTS
@@ -56,6 +63,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Post'
+        401:
+          description: Ошибка авторизации
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/AuthorizationError'
+        400:
+          description: Ошибка. Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
   /posts/{id}/:
     get:
       tags:
@@ -76,11 +95,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/Post'
         400:
-          description: Ошибка
+          description: Ошибка. Некорректный запрос
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ValidationError'
+        404:
+          description: Ошибка. Поста с данным id не существует
     put:
       tags:
         - POSTS
@@ -104,12 +125,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Post'
+        401:
+          description: Ошибка авторизации
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/AuthorizationError'
         400:
           description: Ошибка
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ValidationError'
+        404:
+          description: Ошибка. Поста с данным id не существует
     patch:
       tags:
         - POSTS
@@ -139,6 +168,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ValidationError'
+        401:
+          description: Ошибка авторизации
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/AuthorizationError'
+        404:
+          description: Ошибка. Поста с данным id не существует
     delete:
       tags:
         - POSTS
@@ -152,7 +189,21 @@ paths:
           type: number
       responses:
         204:
-          description: ''
+          description: 'Публикация успешно удалена'
+        401:
+          description: Ошибка авторизации
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/AuthorizationError'
+        400:
+          description: Ошибка. Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        404:
+          description: Ошибка. Поста с данным id не существует
   /posts/{post_id}/comments/:
     get:
       tags:
@@ -173,8 +224,15 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Comment'
-          description: ''
-
+          description: 'Все комментарии успешно получены'
+        400:
+          description: Ошибка. Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        404:
+          description: 'Ошибка. Поста с данным id не существует'
     post:
       tags:
         - COMMENTS
@@ -190,8 +248,21 @@ paths:
         200:
           content:
             application/json:
-              schema: {}
-          description: ''
+              schema:
+                $ref: '#/components/schemas/Comment'
+          description: 'Комментарий к публикации создан'
+        400:
+          description: Ошибка. Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        401:
+          description: Ошибка авторизации
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/AuthorizationError'
   /posts/{post_id}/comments/{comment_id}/:
     get:
       tags:
@@ -214,8 +285,11 @@ paths:
         200:
           content:
             application/json:
-              schema: {}
-          description: ''
+              schema:
+                  $ref: '#/components/schemas/Comment'
+          description: 'Комментарий к посту успешно получен'
+        404:
+          description: 'Ошибка. Поста с данным id или комментария с данным id не существует'
     put:
       tags:
         - COMMENTS
@@ -235,10 +309,25 @@ paths:
           type: number
       responses:
         200:
+          description: Комментарий к посту успешно обновлен
           content:
             application/json:
-              schema: {}
-          description: ''
+              schema:
+                  $ref: '#/components/schemas/Comment'
+        400:
+          description: Ошибка. Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        404:
+          description: 'Ошибка. Поста с данным id или комментария с данным id не существует'
+        401:
+          description: Ошибка авторизации
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/AuthorizationError'
     patch:
       tags:
         - COMMENTS
@@ -258,10 +347,25 @@ paths:
           type: number
       responses:
         200:
+          description: Комментарий к посту успешно обновлен
           content:
             application/json:
-              schema: {}
-          description: ''
+              schema:
+                  $ref: '#/components/schemas/Comment'
+        400:
+          description: Ошибка. Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        404:
+          description: 'Ошибка. Поста с данным id или комментария с данным id не существует'
+        401:
+          description: Ошибка авторизации
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/AuthorizationError'
     delete:
       tags:
         - COMMENTS
@@ -281,7 +385,15 @@ paths:
           type: number
       responses:
         204:
-          description: ''
+          description: 'Комментарий успешно удалён'
+        404:
+          description: 'Ошибка. Поста с данным id или комментария с данным id не существует'
+        401:
+          description: Ошибка авторизации
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/AuthorizationError'
   /token/:
     post:
       tags:
@@ -338,7 +450,13 @@ paths:
                     type: string
                 required:
                 - refresh
-          description: ''
+          description: 'Токен успешно обновлен'
+        400:
+          description: Ошибка
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
 
   /follow/:
     get:
@@ -450,6 +568,14 @@ components:
           readOnly: true
     ValidationError:
       title: Ошибка валидации
+      type: object
+      properties:
+        field_name:
+          type: array
+          items:
+            type: string
+    AuthorizationError:
+      title: Ошибка авторизации
       type: object
       properties:
         field_name:
