@@ -51,7 +51,7 @@ class FollowListCreateViewSet(
         serializer.save(user=self.request.user)
 
 
-class GroupCreateViewSet(
+class GroupListCreateViewSet(
     mixins.ListModelMixin, mixins.CreateModelMixin,
     viewsets.GenericViewSet
 ):
