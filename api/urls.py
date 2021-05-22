@@ -7,9 +7,9 @@ from .views import (CommentViewSet, FollowListCreateViewSet,
 
 router_v1 = DefaultRouter()
 router_v1.register(
-    r'(?P<post_id>\d+)/comments', CommentViewSet,
+    r'posts/(?P<post_id>\d+)/comments', CommentViewSet,
     basename='comments')
-router_v1.register('', PostViewSet)
+router_v1.register('posts', PostViewSet)
 
 urlpatterns = [
     path('v1/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -23,5 +23,5 @@ urlpatterns = [
         FollowListCreateViewSet.as_view(
             {'get': 'list', 'post': 'create'})
     ),
-    path('v1/posts/', include(router_v1.urls)),
+    path('v1/', include(router_v1.urls)),
 ]
