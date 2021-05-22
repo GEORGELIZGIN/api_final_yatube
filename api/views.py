@@ -1,20 +1,11 @@
-from django.core import exceptions
 from django.shortcuts import get_object_or_404
-from rest_framework import (
-    viewsets,
-    mixins,
-    permissions,
-    filters,
-    exceptions)
-
-from .models import Post, User, Group, Follow
-from .permissions import PostAndCommentPermissions
-from .serializers import (
-    CommentSerializer,
-    PostSerializer,
-    FollowSerializer,
-    GroupSerializer)
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, mixins, permissions, viewsets
+
+from .models import Follow, Group, Post
+from .permissions import PostAndCommentPermissions
+from .serializers import (CommentSerializer, FollowSerializer, GroupSerializer,
+                          PostSerializer)
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -50,39 +41,20 @@ class FollowListCreateViewSet(
 
     serializer_class = FollowSerializer
     permission_classes = (permissions.IsAuthenticated,)
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['user__username']
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('user__username', 'following__username')
 
     def get_queryset(self):
-        return self.request.user.followers.all()
+        return Follow.objects.filter(following=self.request.user)
 
     def perform_create(self, serializer):
-
-        if serializer.is_valid(raise_exception=True):
-            if (
-                not User.objects.filter(
-                    username=self.request.data.get('following')
-                ).exists()
-            ):
-                raise exceptions.ParseError()
-            following = User.objects.get(
-                username=self.request.data.get('following'))
-            user = self.request.user
-            if (following == user):
-                raise exceptions.ParseError()
-
-            if Follow.objects.filter(following=following, user=user).exists():
-                raise exceptions.ParseError()
-
-            serializer.save(user=user, following=following)
+        serializer.save(user=self.request.user)
 
 
 class GroupCreateViewSet(
     mixins.ListModelMixin, mixins.CreateModelMixin,
     viewsets.GenericViewSet
 ):
-
     queryset = Group.objects.all()
-
     serializer_class = GroupSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
